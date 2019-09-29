@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# file: test-lhq-api.sh
+# author: @wgxo
+
+# Test script that calls the API endpoint in the emaillabs web interface
+
 command -v http >/dev/null 2>&1 || (echo "HTTPie is not installed!"; exit)
 
 http --timeout=300 emaillabs.ec2.internal/API/mailing_list.html type==list activity==query-listdata input=='<DATASET>

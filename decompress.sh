@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# file: decompress.sh
+# author: @wgxo
+
+# This file decompresses the payload and calls the installer script.
+
 echo ""
 echo "Self Extracting Installer"
 echo ""

@@ -1,6 +1,13 @@
 #!/bin/bash
 
+# file: build.sh
+# author: @wgxo
+
+# This script builds a self-installer file
+
 INSTALLER="lyrishq-installer.bsx"
+
+echo "Build started."
 
 cd `dirname $0`
 cd payload
@@ -23,6 +30,7 @@ else
 fi
 
 chmod +x $INSTALLER
-echo "$INSTALLER created"
+
+echo "Self-installer file created: $INSTALLER"
 
 exit 0
