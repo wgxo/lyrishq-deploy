@@ -16,6 +16,7 @@ blue()   echo "${BLUE}$@${NOCOLOR}"
 yellow() echo "${YELLOW}$@${NOCOLOR}"
 purple() echo "${PURPLE}$@${NOCOLOR}"
 cyan()   echo "${CYAN}$@${NOCOLOR}"
+red()    echo "${LIGHT_RED}$@${NOCOLOR}"
 
 blue "*** SETTING UP AND DEPLOYING Lyris HQ ***"
 
@@ -30,6 +31,7 @@ cd $CURDIR
 (command -v docker >/dev/null 2>&1 && out " - Docker is installed") || die "Docker is not installed!"
 (command -v docker-compose >/dev/null 2>&1 && out " - Docker compose is installed") || die "Docker Compose is not installed!"
 (command -v git >/dev/null 2>&1 && out " - Git is installed") || die "Git is not installed!"
+(command -v http >/dev/null 2>&1 && out " - HTTPie is installed") || purple "HTTPie is not installed!"
 
 [ -z $(id|grep -Poe docker) ] && die "User does not belong to docker group"
 
@@ -49,7 +51,7 @@ cd lyrishq
 
 out " - Updating submodules"
 perl -pi -e 's[https://github.com/trilogy-group][git\@github.com:trilogy-group]' .gitmodules
-[ -f emaillabs/app/src/.git ] || (git submodule sync && git submodule update --recursive) || die "Cannot initialize submodules"
+[ -d emaillabs/app/src/.git ] || (git submodule sync && git submodule update --init --remote --checkout --recursive) || die "Cannot initialize submodules"
 
 out " - Extracting payload files..."
 tar xvf $TEMP_DIR/files.tar
@@ -63,46 +65,27 @@ if [ -z "`grep -Poe 'COPY ./files/config' $DOCKERFILE`" ]; then
 		echo "COPY ./files/config  /etc/mysql/conf.d/" >> $DOCKERFILE
 fi
 
-exit
+out " - Fixing docker-compose.yml labels"
+perl -pi -e 's[- "(SERVICE_\d+(_\w+)+?)=(.+)"$][\1: "\3"]' docker-compose.yml
+perl -pi -e 's[- (SERVICE_\d+(_\w+)+?)=(.+)$][\1: "\3"]' docker-compose.yml
 
-cd ../aladdin
+out " - Updating docker-compose.yml MySQL volume and port"
+sed -i 's/- "3306"/- "3306:3306"/' docker-compose.yml
+sed -i '/- "3306:3306"/a\    volumes:\n      - database:/var/lib/mysql\n' docker-compose.yml 
+sed -i '/nexus-data:$/a\  database:\n' docker-compose.yml 
 
-out " - Fixing brewfictus hostname"
-grep -rl brewfictus.kayako.com ../* 2>/dev/null | while read f; do
-    perl -pi -e 's[brewfictus.kayako.com][brewfictus.kayako.com]' $f
-done
+out " - Setting up HTTP port for web container"
+sed -i 's/- "80:80"/- "80"/' docker-compose.yml 
+sed -i '/http:\/\/web:8080/{N;N;N;N;N;N;N;N;s/- "8080"/- "80:8080"/;}' docker-compose.yml 
 
-out " - Copying config files"
-cp -fva configs/novo-api/* ../novo-api/__config/ | sed -e 's/^.*\///' -e "s/'//" 
-
-out " - Creating .env file"
-cat <<EOF > .env
-CODE_PATH=../novo-api
-# here to stop docker complaining that the variable is not set
-BLACKFIRE_CLIENT_ID=
-BLACKFIRE_CLIENT_TOKEN=
-BLACKFIRE_SERVER_ID=
-BLACKFIRE_SERVER_TOKEN=
-EOF
-
-out " - Updating docker-compose file"
-perl -pi -e 's[context: ../kayako-realtime-engine][context: ../realtime-engine]' docker-compose.yml
-perl -pi -e 's[context: ../relay][context: ../novo-relay]' docker-compose.yml
-
-out " - Updating php container reference in site.conf"
-perl -pi -e 's[php5:9000][php:9000]' web/site.conf
-
-out " - Building web container"
-docker-compose up -d --build web || die "Cannot start web container"
-
-out " - Rebuilding database"
-docker-compose exec -T db mysql -u root -pOGYxYmI1OTUzZmM -e 'drop database if exists `brewfictus.kayako.com`; create database `brewfictus.kayako.com`;' || die "Cannot setup database"
-docker-compose exec -T redis ash -c 'redis-cli flushall' || die "Cannot flush redis"
-
-out " - Setting up TNK"
-docker-compose exec -T php bash -c 'cd /var/www/html/product/setup && php console.setup.php "Brewfictus" "brewfictus.kayako.com" "Brewfictus" "admin@kayako.com" "setup"' || die "Cannot setup TNK"
+out " - Building emaillabs containers"
+docker-compose up -d web mail-control mail-out mail-in mail-processing
 
 green "SUCCESS!!"
 
-echo "-- Installation finished --"
-echo
+cyan "1. MySQL is running locally, use 'mysql -uroot -pdevdev -h 127.0.0.1 uptilt_db'"
+cyan "2. Emaillabs web interface is running locally, use 'http :/' if you have HTTPie installed"
+
+echo ""
+red "-- Installation finished --"
+echo ""
