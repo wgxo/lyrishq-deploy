@@ -1,5 +1,7 @@
 # lyrishq-deploy
-Lyris HQ setup and deployment scripts
+Lyris HQ setup and deployment scripts.
+
+Main installer script: [payload/installer.sh](payload/installer.sh)
 
 ### Usage
 To generate a self-installer script use: `./build.sh` and then execute the generated script: `./lyrishq-installer.bsx`
