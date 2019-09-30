@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# file: installer.sh
+# author: @wgxo
+
+# Setup and installation script for Lyris HQ
+ 
 # COLORS
 BROWN="\033[0;33m"; BLUE="\033[1;34m"; RED="\033[0;31m"; LIGHT_RED="\033[1;31m"; PURPLE="\033[1;35m"
 GREEN="\033[1;32m"; WHITE="\033[1;37m"; LIGHT_GRAY="\033[0;37m"; YELLOW="\033[1;33m"; CYAN="\033[1;36m"
