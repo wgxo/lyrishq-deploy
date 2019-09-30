@@ -69,5 +69,5 @@ ubuntu@ip-10-66-25-89:~/deploy$
 ```
 
 ### Helper scripts
-1. install-docker.sh: Installs **docker** and **docker-compose** programs (for Ubuntu)
-2. test-lhq-api.sh: Tests the API endpoints (it requires HTTPie, to install use `apt install httpie`)
+1. [install-docker.sh](install-docker.sh): Installs **docker** and **docker-compose** programs (for Ubuntu)
+2. [test-lhq-api.sh](test-lhq-api.sh): Tests the API endpoints (it requires **HTTPie**, to install use `apt install httpie`)
