@@ -84,7 +84,7 @@ sed -i 's/- "80:80"/- "80"/' docker-compose.yml
 sed -i '/http:\/\/web:8080/{N;N;N;N;N;N;N;N;s/- "8080"/- "80:8080"/;}' docker-compose.yml 
 
 out " - Building emaillabs containers"
-docker-compose up -d web mail-control mail-out mail-in mail-processing
+docker-compose up -d web mail-control mail-out mail-in mail-processing || die Docker-compose failed
 
 green "SUCCESS!!"
 
