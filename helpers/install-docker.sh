@@ -10,7 +10,7 @@ set -x
 sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
-if [ -z $(grep -Poe eoan /etc/apt/sources.list) ]; then
+if [ -z "`grep -Poe eoan /etc/apt/sources.list`" ]; then
     DIST=$(lsb_release -cs)
 else
     DIST="disco"
