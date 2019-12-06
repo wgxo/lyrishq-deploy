@@ -9,7 +9,14 @@ set -x
 
 sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository  "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs) stable"
+
+if [ -z $(grep -Poe eoan /etc/apt/sources.list) ]; then
+    DIST=$(lsb_release -cs)
+else
+    DIST="disco"
+fi
+sudo add-apt-repository  "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $DIST stable"
+
 sudo apt-get update
 sudo apt-get -y install docker-ce
 sudo systemctl status docker
