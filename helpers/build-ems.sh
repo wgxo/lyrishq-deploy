@@ -27,7 +27,7 @@ cyan "*** SETTING UP AND DEPLOYING EMSERVICES AND LYRISHQ-WEB ***"
 
 [ -d lyris-hq ] || die There is no lyris-hq directory
 
-if [ -z $(grep -Poe "FROM maven\:3\-jdk\-8 as builder" lyris-hq/authorization/Dockerfile) ]; then
+if [ -z "`grep -Poe "FROM maven\:3\-jdk\-8 as builder" lyris-hq/authorization/Dockerfile`" ]; then
 out Patching Dockerfiles
 cat<<EOF|git apply || die Git failed
 diff --git a/emservices/app/Dockerfile b/emservices/app/Dockerfile
